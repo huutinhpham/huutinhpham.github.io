@@ -1,0 +1,70 @@
+@import url("https://fonts.googleapis.com/css?family=Raleway");
+* {
+  margin: 0;
+  padding: 0; }
+
+body {
+  font-family: "Raleway", sans-serif;
+  margin-left: 2%;
+  margin-right: 2%;
+  background-color: white; }
+
+#nav-links {
+  margin-top: 15px;
+  margin-bottom: 100px;
+  display: flex;
+  flex-wrap: wrap;
+  list-style-type: none; }
+  #nav-links .link {
+    padding-right: 4%;
+    border-bottom: 1px solid rgba(0, 0, 0, 0);
+    transition: border-bottom .5s;
+    transition-timing-function: ease-in-out; }
+    #nav-links .link:hover {
+      border-bottom: 1px solid black; }
+    #nav-links .link:not(:first-child) {
+      padding-left: 4%; }
+
+#introduction {
+  margin-bottom: 150px; }
+  #introduction b {
+    color: #ff6961; }
+  #introduction p {
+    font-size: 20px; }
+  #introduction h1 {
+    font-weight: 100;
+    font-size: 45px;
+    margin-bottom: 40px; }
+
+.section-title {
+  font-weight: 100;
+  margin-bottom: 25px;
+  background-color: #F5F5F5; }
+
+.section-subtitle {
+  font-weight: 100;
+  margin-top: 10px;
+  font-size: 16px; }
+
+.skills {
+  padding-left: 20%;
+  margin-top: 10px;
+  font-size: 14px;
+  margin-bottom: 75px; }
+  .skills li {
+    padding-bottom: 10px; }
+  .skills p {
+    color: black; }
+  .skills .proficient {
+    color: #77dd77; }
+  .skills .familiar {
+    color: #d0c722; }
+  .skills .beginner {
+    color: #ff6961; }
+
+.card {
+  background-color: white;
+  margin-bottom: 5px;
+  margin-right: 1%; }
+
+/*# sourceMappingURL=main.css.map */
