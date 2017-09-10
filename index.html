@@ -21,49 +21,118 @@
 			<h1>Hey, I am <b id="important">Huu</b> :)</h1>
 			<p> That's 'Hue' like the property of colors. I am a recent graduate from <b id="important">UC Berkeley</b>. I am a thinker, a painter, and a programmer! </p>
 		</div>
+		
+		<h2 class="section-title">What I know</h2>
+		<div id="skill-section">
+			<div class="skill-card">
+				<h3 class="section-subtitle">Programming Languages</h3><hr />
 
+					<ul class="skill-row">
+						<li class="proficient skill"><p>Python</p></li>
+						<li class="proficient skill"><p>Java</p></li>
+						<li class="proficient skill"><p>HTML</p></li>
+						<li class="proficient skill"><p>CSS</p></li>
+					</ul>
+					<ul class="skill-row">
+						<li class="proficient skill"><p>C/C++</p></li>
+						<li class="familiar skill"><p>Javascript</p></li>
+						<li class="familiar skill"><p>SQL</p></li>
+						<li class="beginner skill"><p>Ruby</p></li>
+					</ul>
+			</div>
 
-		<div id="skills-section">
-			<h2 class="section-title">What I know</h2>
+			<div class="skill-card">
+				<h3 class="section-subtitle">Programming Tools</h3><hr />
 
-			<h3 class="section-subtitle">Programming Languages</h3><hr />
-				<ul class="skills">
-					<li class="proficient"><p>Python</p></li>
-					<li class="proficient"><p>Java</p></li>
-					<li class="proficient"><p>HTML</p></li>
-					<li class="proficient"><p>CSS</p></li>
-					<li class="proficient"><p>C/C++</p></li>
-					<li class="familiar"><p>Javascript</p></li>
-					<li class="familiar"><p>SQL</p></li>
-					<li class="beginner"><p>Ruby</p></li>
-				</ul>
-
-			<h3 class="section-subtitle">Programming Tools</h3><hr />
-				<ul class="skills">
-					<li class="proficient"><p>SCSS</p></li>
-					<li class="proficient"><p>React</p></li>
-					<li class="familiar"><p>JSON</p></li>
-					<li class="familiar"><p>Git</p></li>
-					<li class="familiar"><p>Linux</p></li>
-					<li class="familiar"><p>Alexa Skill Set</p></li>
-					<li class="familiar"><p>AWS Lambda</p></li>
-					<li class="familiar"><p>TDD</p></li>
-					<li class="familiar"><p>Agile Development</p></li>
-				</ul>
+					<ul class="skill-row">
+						<li class="proficient skill"><p>SCSS</p></li>
+						<li class="proficient skill"><p>React</p></li>
+						<li class="familiar skill"><p>JSON</p></li>
+					</ul>
+					<ul class="skill-row">
+						<li class="familiar skill"><p>Git</p></li>
+						<li class="familiar skill"><p>Linux</p></li>
+						<li class="familiar skill"><p>Alexa Skill Set</p></li>
+					</ul>
+					<ul class="skill-row">
+						<li class="familiar skill"><p>AWS Lambda</p></li>
+						<li class="familiar skill"><p>TDD</p></li>
+						<li class="familiar skill"><p>Agile Development</p></li>
+					</ul>
+			</div>
 		</div>
 
-		
-		<div id="projects-section">
-			<h2 class="section-title">What I've Done</h2>
+		<h2 class="section-title">What I've Done</h2>
+		<div id="proj-section">
+			<div class="proj-row">
+				<div class="proj-card">
+					<h3 class="section-subtitle">Money Talks</h3><hr />
+					<p class="project-description">Voice-based budgeting application that takes advantage of quick voice queries to update spendings. Voice eliminated slow GUI interactions to improve retention.</p>
 
-			<div id="projects">
-				<div class="card project">Project-1</div>
-				<div class="card project">Project-2</div>
-				<div class="card project">Project-3</div>
-				<div class="card project">Project-4</div>
-				<div class="card project">Project-5</div>
-				<div class="card project">Project-6</div>
+					<ul class="tools">
+						<li class="tool"><p>Alexa Skill Set</p></li>
+						<li class="tool"><p>AWS Lambda</p></li>
+						<li class="tool"><p>AWS DynamoDB</p></li>
+					</ul>
+
+					<ul class="proj-links">
+						<li class="btn"><a href="#">Code</a></li>
+						<li class="btn"><a href="#">Documentation</a></li>
+					</ul>
+				</div>
+
+				<div class="proj-card">
+					<h3 class="section-subtitle">Rasterizester</h3><hr />
+					<p class="project-description">2D images were rendered using triangles. Triangles' boundaries were identified using barycentric coordinates. Supersampling was implemented to anti-alias.</p>
+
+					<ul class="tools"><li class="tool"><p>C++</p></li></ul>
+
+					<ul class="proj-links">
+						<li class="btn"><a href="#">Code</a></li>
+						<li class="btn"><a href="#">Documentation</a></li>
+					</ul>
+				</div>
 			</div>
+			
+			<div class="proj-row">
+				<div class="proj-card">
+					<h3 class="section-subtitle">GeoMenagerie</h3><hr />
+					<p class="project-description">3D objects were rendered using triangle meshes. Triangle meshes were implemented using half-edge data structure. Objects curves were determined using bezier patch, and improved using loop-division.</p>
+					<ul class="tools"><li class="tool"><p>C++</p></li></ul>
+
+					<ul class="proj-links">
+						<li class="btn"><a href="#">Code</a></li>
+						<li class="btn"><a href="#">Documentation</a></li>
+					</ul>
+
+				</div>
+
+				<div class="proj-card">
+					<h3 class="section-subtitle">Path Tracer</h3><hr />
+					<p class="project-description">Rays are sampled and traced from a point into triangle meshes. Objects and lighting were rendered using intersection between rays and objects. Boundary-box structure was used to decrease search space, and improve performance.</p>
+					<ul class="tools"><li class="tool"><p>C++</p></li></ul>
+
+					<ul class="proj-links">
+						<li class="btn"><a href="#">Code</a></li>
+						<li class="btn"><a href="#">Documentation</a></li>
+					</ul>
+				</div>
+			</div>
+
+			<div class="proj-row">
+				<div class="proj-card">
+					<h3 class="section-subtitle">Lens Simulator</h3><hr />
+					<p class="project-description">Path Tracers' rays were distorted to simulate lenses. Rays interacted with curves to refract their directions before entering the scene.</p>
+					<ul class="tools"><li class="tool"><p>C++</p></li></ul>
+
+					<ul class="proj-links">
+						<li class="btn"><a href="#">Code</a></li>
+						<li class="btn"><a href="#">Documentation</a></li>
+					</ul>
+				</div>
+
+			</div>
+			
 		</div>
 	</body>
 	</script> 

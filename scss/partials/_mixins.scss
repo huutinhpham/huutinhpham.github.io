@@ -1,0 +1,11 @@
+
+@mixin bullet-item($color: $font-color) {
+	color: $color;
+	p {color: $font-color}
+}
+
+@mixin flex {
+	 display: -webkit-flex;
+	 display: flex;
+	 flex-wrap: wrap;
+}
