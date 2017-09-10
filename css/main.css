@@ -24,10 +24,14 @@ body {
     #nav-links .link a {
       border-bottom: 1px solid rgba(0, 0, 0, 0);
       transition: border-bottom .5s;
-      transition-timing-function: ease-in-out; }
+      transition-timing-function: ease-in-out;
+      text-decoration: none;
+      color: black; }
       #nav-links .link a:hover {
         border-bottom: 1px solid black;
         cursor: pointer; }
+      #nav-links .link a:visited {
+        color: black; }
 
 #introduction {
   margin-bottom: 175px; }

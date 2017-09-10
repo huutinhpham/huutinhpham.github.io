@@ -30,10 +30,13 @@ body {
 			border-bottom: 1px solid transparentize($font-color, 1);
 			transition: border-bottom .5s;
 	    	transition-timing-function: ease-in-out;
+	    	text-decoration: none;
+	    	color: $font-color;
 	    	&:hover {
 	    		border-bottom: 1px solid opacify($font-color, .5);
 	    		cursor: pointer;
 	    	}
+	    	&:visited { color: $font-color; }
     	}
 	}
 }
