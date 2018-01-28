@@ -1,0 +1,159 @@
+<!DOCTYPE HTML>
+<html>
+	<header>
+		<meta charset="utf-8"/>
+		<meta name="viewport" content="width=device-width initial-scale=1"/>
+		<link rel="stylesheet" type="text/css" href="../static/css/main.css" />
+		<title>Huu Tinh Nguyen Pham</title>
+	</header>
+
+	<body>
+
+		<ul id="nav-links">
+			<li class="link"><a href="mailto:huutinh@berkeley.edu">Email</a></li>
+			<li class="link"><a href="https://www.linkedin.com/in/huutinhpham/" target="_blank">LinkedIn</a></li>
+			<li class="link"><a href="https://github.com/huutinhpham" target="_blank">GitHub</a></li>
+			<li class="link"><a href="/portfolio/static/resume">Resume</a></li>
+		</ul>
+
+
+		<div id="introduction">
+			<h1>Hello World, I am <b id="important">Huu</b> :)</h1>
+			<p> That's 'Hue' like the property of colors. I am a recent graduate from <b id="important">UC Berkeley</b>. I am a thinker, a painter, and a programmer! </p>
+		</div>
+		
+		<h2 class="section-title">What I know</h2>
+		<div id="skill-section">
+			<div class="skill-card">
+				<h3 class="section-subtitle">Programming Languages</h3><hr />
+
+					<ul class="skill-row">
+						<li class="proficient skill"><p>Python</p></li>
+						<li class="proficient skill"><p>Java</p></li>
+						<li class="proficient skill"><p>HTML</p></li>
+					</ul>
+					<ul class="skill-row">
+						<li class="proficient skill"><p>C/C++</p></li>
+						<li class="proficient skill"><p>Javascript</p></li>
+						<li class="familiar skill"><p>SQL</p></li>
+					</ul>
+					<ul class="skill-row">
+						<li class="proficient skill"><p>CSS</p></li>
+					</ul>
+			</div>
+
+			<div class="skill-card">
+				<h3 class="section-subtitle">Programming Tools</h3><hr />
+
+					<ul class="skill-row">
+						<li class="proficient skill"><p>AJAX</p></li>
+						<li class="proficient skill"><p>jQuery</p></li>
+						<li class="proficient skill"><p>JSON</p></li>
+					</ul>
+					<ul class="skill-row">
+						<li class="proficient skill"><p>PostgreSQL</p></li>
+						<li class="proficient skill"><p>AWS</p></li>
+						<li class="proficient skill"><p>Flask</p></li>
+					</ul>
+					<ul class="skill-row">
+						<li class="proficient skill"><p>SCSS</p></li>
+						<li class="proficient skill"><p>PostgreSQL</p></li>
+						<li class="proficient skill"><p>MVC Design</p></li>
+					</ul>
+					<ul class="skill-row">
+						<li class="familiar skill"><p>Git</p></li>
+						<li class="familiar skill"><p>Alexa Skill Set</p></li>
+					</ul>
+			</div>
+		</div>
+
+		<h2 class="section-title">What I've Done</h2>
+		<div id="proj-section">
+			<div class="proj-row">
+				<div class="proj-card">
+					<h3 class="section-subtitle">Rendezvooo</h3><hr />
+					<p class="project-description">Collaborative music application that uses YouTube API. With YouTube URLs users are able to collaboratively build and share playlists. URLs are parsed and embedded into a player within the playlist. Upvote feature is used to play and sort songs by number of "likes"</p>
+
+					<ul class="tools">
+						<li class="tool"><p>Alexa Skill Set</p></li>
+						<li class="tool"><p>AWS Lambda</p></li>
+						<li class="tool"><p>AWS DynamoDB</p></li>
+					</ul>
+
+					<ul class="proj-links">
+						<li class="btn"><a href="/rendezvooo" target="_blank">Application</a></li>
+						<li class="btn"><a href="https://github.com/huutinhpham/Rendezvooo" target="_blank">Code</a></li>
+					</ul>
+				</div>
+
+				<div class="proj-card">
+					<h3 class="section-subtitle">Money Talks</h3><hr />
+					<p class="project-description">Voice-based budgeting application, that takes advantage of quick voice queries to update spendings. Voice eliminates the slow GUI interactions, ultimately decreases users' workload and improves retention rate.</p>
+
+					<ul class="tools">
+						<li class="tool"><p>Alexa Skill Set</p></li>
+						<li class="tool"><p>AWS Lambda</p></li>
+						<li class="tool"><p>AWS DynamoDB</p></li>
+					</ul>
+
+					<ul class="proj-links">
+						<li class="btn"><a href="https://github.com/kaloncheung124/money_talks" target="_blank">Code</a></li>
+					</ul>
+				</div>
+			</div>
+			
+			<div class="proj-row">
+				<div class="proj-card">
+					<h3 class="section-subtitle">Rasterizester</h3><hr />
+					<p class="project-description">Rendered 2D images using triangles. Barycentric coordinates were used to identify triangle boundaries, and implemented supersampling to anti-alias.</p>
+
+					<ul class="tools"><li class="tool"><p>C++</p></li></ul>
+
+					<ul class="proj-links">
+						<li class="btn"><a href="https://github.com/huutinhpham/rasterizester" target="_blank">Code</a></li>
+						<li class="btn"><a href="/projects/Rasterizester" target="_blank">Documentation</a></li>
+					</ul>
+				</div>
+				<div class="proj-card">
+					<h3 class="section-subtitle">GeoMenagerie</h3><hr />
+					<p class="project-description">Rendered 3D objects using triangle meshes. Triangle meshes were built using half-edge data structures. To determine objects' curvature Bezier's patch was used. Finally loop-division smoothens curvative by increasing amount of triangles.</p>
+					<ul class="tools"><li class="tool"><p>C++</p></li></ul>
+
+					<ul class="proj-links">
+						<li class="btn"><a href="https://github.com/huutinhpham/GeoMenagerie" target="_blank">Code</a></li>
+						<li class="btn"><a href="/projects/GeoMenagerie" target="_blank">Documentation</a></li>
+					</ul>
+
+				</div>
+			</div>
+
+			<div class="proj-row">
+				<div class="proj-card">
+					<h3 class="section-subtitle">Path Tracer</h3><hr />
+					<p class="project-description">Rays are sampled and traced from a point into a triangle mesh. Objects and lighting were rendered using intersection between rays and objects. Boundary-box structure was used to decrease search space, and improve performance.</p>
+					<ul class="tools"><li class="tool"><p>C++</p></li></ul>
+
+					<ul class="proj-links">
+						<li class="btn"><a href="https://github.com/huutinhpham/pathtracer" target="_blank">Code</a></li>
+						<li class="btn"><a href="/projects/PathTracer" target="_blank">Documentation</a></li>
+					</ul>
+				</div>
+
+				<div class="proj-card">
+					<h3 class="section-subtitle">Lens Simulator</h3><hr />
+					<p class="project-description">Path Tracers' rays were distorted to simulate lenses. Rays interacted with curves to refract their directions before entering the scene.</p>
+					<ul class="tools"><li class="tool"><p>C++</p></li></ul>
+
+					<ul class="proj-links">
+						<li class="btn"><a href="https://github.com/huutinhpham/lenssimulator" target="_blank">Code</a></li>
+						<li class="btn"><a href="/projects/LensSimulator" target="_blank">Documentation</a></li>
+					</ul>
+				</div>
+
+			</div>
+
+		</div>
+	</body>
+	</script> 
+
+</html>

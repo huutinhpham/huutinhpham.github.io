@@ -1,0 +1,147 @@
+@import "partials/variables";
+@import "partials/mixins";
+
+*{
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	font-family: $font-family;
+	margin-left: 2%;
+	margin-right: 2%;
+	background-color: $background-color;
+	font-size: $font-size;
+}
+
+#nav-links {
+	@include flex;
+	margin-top: 15px;
+	margin-bottom: 150px;
+	list-style-type: none;
+
+	.link {
+		padding-right: 4%;
+		&:not(:first-child) {
+			padding-left: 4%;
+		}
+
+		a { 
+			border-bottom: 1px solid transparentize($font-color, 1);
+			transition: border-bottom .5s;
+	    	transition-timing-function: ease-in-out;
+	    	text-decoration: none;
+	    	color: $font-color;
+	    	&:hover {
+	    		border-bottom: 1px solid opacify($font-color, .5);
+	    		cursor: pointer;
+	    	}
+	    	&:visited { color: $font-color; }
+    	}
+	}
+}
+
+#introduction{
+	margin-bottom: 175px;
+	b { color: $pastel-red; }
+	p { font-size: 20px; }
+
+	h1 {
+		font-weight: 100;
+		font-size: 45px;
+		margin-bottom: 40px;
+	}
+}
+
+.section-title {
+	font-weight: 100;
+	margin-bottom: 25px;
+	background-color: $light-gray;
+}
+
+.section-subtitle {
+	font-weight: 100;
+	margin-top: 10px;
+}
+
+.skill-row {
+	margin-top: 10px;
+	
+	li {
+		margin-left: 15%;
+		margin-bottom: 10px;
+	}
+	.proficient { @include bullet-item($pastel-green); }
+	.familiar { @include bullet-item($pastel-yellow); }
+	.beginner{ @include bullet-item($pastel-red); }
+}
+
+.skill-card {
+	margin-right: 3%;
+	margin-bottom: 75px;
+}
+
+.proj-card {
+	margin-right: 3%;
+	margin-bottom: 125px;
+	.project-description { margin-top: 10px; }
+
+	.tools {
+		margin-left: 4%;
+		margin-top: 15px;
+		.tool { @include bullet-item ($pastel-blue); }
+	}
+
+	.proj-links {
+		margin-top: 15px;
+		list-style-type: none;
+		display: flex;
+		.btn a {
+			color: $pastel-blue;
+			border: 1px solid $pastel-blue;
+			text-decoration: none;
+			text-align: center;
+			padding: 3px 5px 3px 5px;
+			margin-right: 10px;
+			&:visited { color: $pastel-blue; }
+			&:hover {
+				color: darken($pastel-blue, 30);
+				border-color: darken($pastel-blue, 30);
+			}
+		}
+	}
+}
+
+
+@media screen and (min-width: 650px) {
+	#introduction {
+		text-align: center;
+	}
+	#skill-section {
+		@include flex;
+		.skill-card { flex: 1; }
+		.skill-row {
+			@include flex;
+			.skill { 
+				margin-left: 3%;
+				margin-right: 3%;
+				flex: 1;
+			}
+		}
+	}
+}
+
+@media screen and (min-width: 830px) {
+	.proj-row {
+		@include flex;
+		.proj-card { flex: 1; }
+	}
+}
+
+@media screen and (min-width: 960px) {
+	body{
+		width: 960px;
+		margin-right: auto;
+		margin-left: auto;
+	}
+}

@@ -1,0 +1,138 @@
+@import url("https://fonts.googleapis.com/css?family=Raleway");
+* {
+  margin: 0;
+  padding: 0; }
+
+body {
+  font-family: "Raleway", sans-serif;
+  margin-left: 2%;
+  margin-right: 2%;
+  background-color: white;
+  font-size: 15px; }
+
+#nav-links {
+  display: -webkit-flex;
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 15px;
+  margin-bottom: 150px;
+  list-style-type: none; }
+  #nav-links .link {
+    padding-right: 4%; }
+    #nav-links .link:not(:first-child) {
+      padding-left: 4%; }
+    #nav-links .link a {
+      border-bottom: 1px solid rgba(0, 0, 0, 0);
+      transition: border-bottom .5s;
+      transition-timing-function: ease-in-out;
+      text-decoration: none;
+      color: black; }
+      #nav-links .link a:hover {
+        border-bottom: 1px solid black;
+        cursor: pointer; }
+      #nav-links .link a:visited {
+        color: black; }
+
+#introduction {
+  margin-bottom: 175px; }
+  #introduction b {
+    color: #ff6961; }
+  #introduction p {
+    font-size: 20px; }
+  #introduction h1 {
+    font-weight: 100;
+    font-size: 45px;
+    margin-bottom: 40px; }
+
+.section-title {
+  font-weight: 100;
+  margin-bottom: 25px;
+  background-color: #F5F5F5; }
+
+.section-subtitle {
+  font-weight: 100;
+  margin-top: 10px; }
+
+.skill-row {
+  margin-top: 10px; }
+  .skill-row li {
+    margin-left: 15%;
+    margin-bottom: 10px; }
+  .skill-row .proficient {
+    color: #77dd77; }
+    .skill-row .proficient p {
+      color: black; }
+  .skill-row .familiar {
+    color: #d0c722; }
+    .skill-row .familiar p {
+      color: black; }
+  .skill-row .beginner {
+    color: #ff6961; }
+    .skill-row .beginner p {
+      color: black; }
+
+.skill-card {
+  margin-right: 3%;
+  margin-bottom: 75px; }
+
+.proj-card {
+  margin-right: 3%;
+  margin-bottom: 125px; }
+  .proj-card .project-description {
+    margin-top: 10px; }
+  .proj-card .tools {
+    margin-left: 4%;
+    margin-top: 15px; }
+    .proj-card .tools .tool {
+      color: #aec6cf; }
+      .proj-card .tools .tool p {
+        color: black; }
+  .proj-card .proj-links {
+    margin-top: 15px;
+    list-style-type: none;
+    display: flex; }
+    .proj-card .proj-links .btn a {
+      color: #aec6cf;
+      border: 1px solid #aec6cf;
+      text-decoration: none;
+      text-align: center;
+      padding: 3px 5px 3px 5px;
+      margin-right: 10px; }
+      .proj-card .proj-links .btn a:visited {
+        color: #aec6cf; }
+      .proj-card .proj-links .btn a:hover {
+        color: #557f8f;
+        border-color: #557f8f; }
+
+@media screen and (min-width: 650px) {
+  #introduction {
+    text-align: center; }
+
+  #skill-section {
+    display: -webkit-flex;
+    display: flex;
+    flex-wrap: wrap; }
+    #skill-section .skill-card {
+      flex: 1; }
+    #skill-section .skill-row {
+      display: -webkit-flex;
+      display: flex;
+      flex-wrap: wrap; }
+      #skill-section .skill-row .skill {
+        margin-left: 3%;
+        margin-right: 3%;
+        flex: 1; } }
+@media screen and (min-width: 830px) {
+  .proj-row {
+    display: -webkit-flex;
+    display: flex;
+    flex-wrap: wrap; }
+    .proj-row .proj-card {
+      flex: 1; } }
+@media screen and (min-width: 960px) {
+  body {
+    width: 960px;
+    margin-right: auto;
+    margin-left: auto; } }
+
+/*# sourceMappingURL=main.css.map */

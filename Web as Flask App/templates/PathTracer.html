@@ -1,0 +1,606 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<style>  
+    div.padded {  
+      padding-top: 0px;  
+      padding-right: 100px;  
+      padding-bottom: 0.25in;  
+      padding-left: 100px;  
+    }  
+  </style> 
+<title>Huu Tinh N Pham  |  CS 184</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="style.css" media="screen" />
+</head>
+<body>
+<br />
+<h1 align="middle">PathTracer</h1>
+    <h2 align="middle">Huu Tinh Nguyen Pham</h2>
+
+
+    <h2 align="middle">Part 1: Ray Generation and Intersection</h2>
+        <p><b>Description:</b></p>
+        <p>Task 1: for this task the function raytrace_pixel where the inputs are the (x, y) coordinate of a pixel and it has the purpose of sampling a pixel by randomly creating rays inside that pixel and take the average of the spectrum that was returned when tracing those rays and average over all the spectrum. First I extracted the width and the height of the sampling frame because that will be used to normalize the position of my sample. I then check to see how many samples the function is taking, if it's just one then I simply take the sample inside the middle of the pixel since it would be the most representative sample. To get this sample I simply add the (x, y) input by (0.5, 0.5), so (x + 0.5, y + 0.5) since (x, y) represents the bottom left corner of the sample. I then normalize these coordinates by the sampleframe, thus dividing x coordinate by width, and y coordinate by height. If there are more than one sample, then I simply use the grid_sampler object which gives a random sample in [0, 1]^2 for all the samples independently. This sample is then used to add into the (x, y) coordinate and normalized like how one sample was normalized. This then creates a normalized vector representation of the sample in the x, y coordinate. This sample is now passed into the generate_ray function (task 2) to create a ray object from the camera into the scene through the input pixel using the sample. Once the ray is created the ray is passed into trace_ray() function (task 3) which traces the ray to retreive the color of the sample inside the pixel. Thus I'd have a for loop that loops over number of samples, create rays accordingly, and trace all of them. The spectrum, or color, returned by the trace_ray function is accumulated inside a spectrum object, which is finally then divded by the number of samples to average out all the spectrums of all the samples and then returned.</p>
+
+        <p>task 2: This task implements the generate_ray frunction, where the input is an (x, y) coordinate and the returned object is a 3D ray object that points into the scene through (x, y). The camera coordinate system is: camera looks into the -z axis, where y is pointing up, and x is horizontal. First I calculated bottom left, and top right coordinate of the plane where the scene is projected to by using the following formula:</p>
+
+        <p align="middle"><pre align="middle">Bottom left = Vector3D(-tan(radians(hFov)*.5), -tan(radians(vFov)*.5),-1)</pre></p>
+
+        <p align="middle"><pre align="middle">Top Right = Vector3D( tan(radians(hFov)*.5),  tan(radians(vFov)*.5),-1)</pre></p>
+
+        <p>where if the input is (0, 0) it would corresponds to bottom left coordinate, and (1, 1) corresponds to the top right coordinate. We know from previous task, that the input are normalized version of the pixel sample, then we can simply use it to linearly interpolate between the bottom left pixel, and top right as follow:</p>
+
+        <p align="middle"><pre align="middle">ray_x = x*top_right.x + (1.0 - x)*bottom_left.x</pre></p>
+
+        <p align="middle"><pre align="middle">ray_y = y*top_right.y + (1.0 - y)*bottom_left.y</pre></p>
+
+        <p align="middle"><pre align="middle">z = -1</pre></p>
+
+        <p>note that z is equals to -1 because that's where the camera points into in the z direction. Now we have the coordinate (x, y, z) into the scene in the camera coordinate system, now all we need to do is convert that vector into world coordinate by multiplying by camera to world matrix, c2w, then normalize the coordinates. That vector is then used as our directional vector for our ray, and the origin of the ray is the camera position (since that's where we are starting the ray at), where minimum_t is the beginning plane of the scene nCLip, and the maximum_t of is the ending plane of the scene, fCLip.Thus I construct the ray by passing all the components into the ray constructor, and return the ray</p>
+
+        <p>task 3: This task consists of implementing triangle intersection functions, where the input is a ray and it's tested against 3 vertices of triangles, p1, p2, p3. The Moller Trumbore Algorithm was used to implement these funtions, it can be found under this reference: 
+        <p> http://cs184.eecs.berkeley.edu/cs184_sp16/lecture/geometry-processing/slide_060. This algorithm is relies on the fact that at time t multiplies by directional vector of the ray, shifted by the origin intersects with the plane created by the triangle. This intersection is at a point, this point has a certain relationship to the triangle, via barycentric coordinates (is explained in raterizester triangle) or ratio. Thus by solving the equations for t, alpha, beta we would get the algorithm</p>
+
+        <p> The returned 3D vector of the algorithm consists of time t, alpha and beta barycentric coordinates of the ray. With this information, I then tested to see if the ray intersect the triangle, or if the barycentric coordinates of the ray in respect to the triangle is in between 0 and 1. Thus alpha, beta, and gamma = 1 - alpha - beta are all in the range of [0, 1]. If they are not then we know that it lies outside of the triangle. Since every ray has a max_t and a min_t indicating the starting t and ending t (range of the ray), thus I checked the intersection, if it intersects with the triangle, that the time of intersection is in between min_t and max_t. If the ray intersects a triangle within that range then we know that we can go ahead and cut the max_t of the ray to the new time that is returned by this intersection. Since we don't need to check any objects behind that triangle (won't be seen). Lastly is to update the intersection object, which has time t of intersection, returned time, normal vector, interpolation of the barycentric coordinates and triangle vertices, the primitive that was intersected, the current triangle, and ast is the bsdf, which is taken care of in later parts.</p>
+
+        <p>task 4: Similar to task 3 the purpose of this task is to test if the input ray intersects with a primitive, instead of a triangle this time is a sphere. To this for this I used the ray intersection with sphere formula that can be found here:</p>
+
+        <p align="middle"><pre align="middle">http://cs184.eecs.berkeley.edu/cs184_sp16/lecture/geometry-processing/slide_061</pre></p>
+
+        <p>In this formula we have the formula for the ray which is t amount in direction d shifted by the origin, and the forumla for the sphere which is for any point p on the sphere, (p - c)^2 - R^2 = 0, where c is the center of the sphere and R is the radius. Thus to solve for the intersection of the sphere we replace p in the sphere formula by o + t*d, or the formula that represents the ray. Then we test whether this o + t*d would become a point, or points, on the sphere. We test this by using the quadratic forumla. We know that if o + t*d intersects with the sphere if b^2 - 4*a*c is positive where a, b, and c are computed in the given slide. Thus we can use this to check if there's an intersection. Thus if b^2 - 4*a*c is positive then we can assume that there's an intersection and solve for t using the quadratic formula, if not false is returned because there's no intersection. Since there is a possibility of t having two solutions, thus we would take the minimum of both since that would represents the first intersection. HOWEVER, I also checked to see if the minimum t is  less than or equals to 0, which means that the ray originated from side the sphere, then instead of taking the minimum t I would take the maximum t. What this does is that for the case where refraction happens inside a sphere, or object, we would want the intersection that is coming out of the sphere. Lastly is we check to see if t is within the range of our ray, if not return false, if yes we update our ray max_t to be the intersected t, and update our intersection object. Similar to task 3, we update our intersection object with the exception that the normal now would be o + t*d - c normalized. Since o +t*d would give us the intersection point, and c is the center, subtracting that would gives us a directional vector that comes out of there sphere normal to point p, and normals should be normalized for mathematical purposes.</p>
+
+        <p><b>Debug:</b> One bug that in this part is not checking for gamma of the barycentric coordinates inside triangle intersection to make sure that it was in between 0, and 1. Since gamma was not returned by the algorithm I forgot about it. Thus to solve for this I simply solved for gamma using alpha and beta. Addtionally another major bug that I encountered for this part is forgetting to normalize the normal that is passed into the intersection object for sphere, which resulted in weird sphere colors. To solve for it I jsut called the built in unit() function of the object vector.</p>
+
+        <p><b>DEBUG DELIVERABLES:</b></p>
+
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="../static/images/PathTracer/part1/p1tribug.png" width="480px" />
+                    <figcaption align="middle">Results Caption: This picture shows the bug when gamma of the barycentric coordinate is not checked inside triangle intersection, allowing one of the side of the triangle to be distorted.</figcaption>
+                </tr>
+            </table>
+        </div>
+
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="../static/images/PathTracer/part1/p1tri.png" width="480px" />
+                    <figcaption align="middle">Results Caption: After the gamma of barycentric coordinate is checked to make sure it's within the bound [0, 1] </figcaption>
+                </tr>
+            </table>
+        </div>
+
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="../static/images/PathTracer/part1/p1sphbug.png" width="480px" />
+                    <figcaption align="middle">Results Caption: The bug that was found when I did not normalize the normal vector coming out of the spheres for the intersection object </figcaption>
+                </tr>
+            </table>
+        </div>
+
+        <p><b>DELIVERABLES:</b>Below are deliverables that represents a working algorithm, noticed which primative is on top of which through different perspectives. This shows that intersection of the ray were account correctly for the closest objects.</p>
+
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="../static/images/PathTracer/part1/1.png" width="480px" />
+                    <figcaption align="middle">Results Caption: Spheres staring straight toward into the scene</figcaption>
+                </tr>
+            </table>
+        </div>
+
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="../static/images/PathTracer/part1/2.png" width="480px" />
+                    <figcaption align="middle">Results Caption: Spheres with a different view</figcaption>
+                </tr>
+            </table>
+        </div>
+
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="../static/images/PathTracer/part1/3.png" width="480px" />
+                    <figcaption align="middle">Results Caption: Spheres with a different view</figcaption>
+                </tr>
+            </table>
+        </div>
+
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="../static/images/PathTracer/part1/4.png" width="480px" />
+                    <figcaption align="middle">Results Caption: Spheres with a different view</figcaption>
+                </tr>
+            </table>
+        </div>
+
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="../static/images/PathTracer/part1/5.png" width="480px" />
+                    <figcaption align="middle">Results Caption: Spheres with a different view</figcaption>
+                </tr>
+            </table>
+        </div>
+
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="../static/images/PathTracer/part1/6.png" width="480px" />
+                    <figcaption align="middle">Results Caption: BANANA!</figcaption>
+                </tr>
+            </table>
+        </div>
+
+        <h2 align="middle">Part 2: Bounding Volume Hierarchy</h2>
+        <p><b>Description:</b></p>
+
+        <p>Task 1: For this part we were to implement bounding volume hiercharcy, or construct_bvh algorithm. The pupose of this part is to divide the primitives into smaller and smaller bounded boxes until it reaches a desired number of primitives per box. In the first for loop we interated over every primitives, extracting the bounding box of the primitives. We then put all the iterated primitives inside a bigger bounding box, bbox, that contains all the primitives. We also have a centroidbox that represents the expansion of all the centers of the bounding boxes of the primitives, i.e it expands to the furthest centroids of all the bounding boxes of primitives. We now then have a giant bounding box that is big enough to contain all the primitives, this would be our root node, and its primitives contains all primitives. If the number of primitives inside this bounding box equals to or less than the desired maximum number of primitives per box then we are done. If not then we now have to decide on which axis to split along. Since we have the centroid box, which expands only to the centers of the bounding boxes, then we know that if we split along this box then we are bounded to have pirimitives in both side, this helps us avoid the 0 primitive on one side case. I then have two variables, one is called split_axis {1, 2, 3} which represents splitting along x, y, and z respectively. As well as a midpoint or the double that represents where along the splitting axis we are splitting. With a few conditional statements I found out which axis is the largest, and set split_axis accordingly. I then calculate the midpoint by finding the min, or starting point, of that axis and add it by half of the extension of that axis (essentially splitting the axis into two). I then created two vectors that stores primitives called l_prims, to store primitives on the left of the midpoint, and r_prims, to store primitives on right of the midpoint. I now iterate over every primitives and depending on the splitting axis I check the primitive bounding_box centroid along that axis. If the centroid is less than the midpoint, then it goes to l_prims else it goes to the r_prims. By the end of this I'll have two vectors of primitives. I then recursively call the function on l_prims, and r_prims, and set my left node child to be whatever is returned when the input is l_prim, likewise for right node child, and simply return the node.</p>
+
+        <p>task 2: For this task given a ray, and time t0, t1, we determine if our current bounding box is intersected by the ray and if it's a valid intersection based on t0 and t1. We know from our previous task that out bounding box is always spliting along a specific axis, thus they are all axis alligned bounding box. Using this information we can project our bounding box, and the ray to all 3 axis and see at what time the ray intersects our slab. A 2D explanation can be found here:</p>
+
+        <p align="middle"><pre align="middle">http://cs184.eecs.berkeley.edu/cs184_sp16/lecture/acceleration/slide_022</pre></p>
+
+        <p>The equation to determine where the intersection at when projected onto a plane along a certain axis can be found here:</p>
+
+        <p align="middle"><pre align="middle">http://cs184.eecs.berkeley.edu/cs184_sp16/lecture/acceleration/slide_012</pre></p>
+
+        <p>Thus using this equation we can project our box and our ray along plane alligned to our 3 axis. I then independently calculate the min_t and max_t, which represents the intersection at a slab each projection, which gives me 6 different times. One thing to note here is that if the direction of the ray is negative then we have to switch our min_t and max_t. With this we can determine whether a ray intersects the box or not by checking if the min_t of one projection is greater than the max_t of another projection, then we know that the ray lies outside of the box. We then tightly bound the min_t and max_t by choosing the min of the max_t, and the max of min_t. Next step is to check if our two intersection time makkes sense with t0, and t1. That is if our min_t is greater than t1, then we know the ray is outside of the box. If our max_t is less than t0 then our ray never reached the box. Lastly, is that we choose the max of min_t and t0 to be our new t0, since that is where the new starting position of our ray. Similarly the min of the t1 and max_t to set the ending point of our ray.</p>
+
+        <p>Task 3: For this task we implemeneted the BVH node intersection algorithm, where we test if a ray hits a bounding box of the node, if it does we either move to its children, or if it belongs to a leave node then we check all the primitive within that node's bounding box. The purpose is to speed up ray tracing. There are two functions in this part, the first only determines if a ray intersect anything in a BVH node or not, the second determines where the intersection is, and which primitive the ray intersected with. We started with the first function we check if the ray intersects the node's bbox, and if it's the leave node then we check if it intersects with any primitive in that box, if yes then we can just return true, since at least one primitive in there is intersected. If there is an intersection with the node, but it's not a leaf node then we recursively calls the function on the left and the right child. If there is no intersection with the node we simply return false and do not have to check any primtive, hense the speed up for ray tracing. The second function has similar concept, however we need to determine the closest intersection of the ray if there is one. Similar to previous function, if there is such an intersection on the node, and the node is a leaf node then we can go ahead and check all the primitives in that node's bounding box. Note that since the function wants to find the closest intersection, we must check all primitives. Recall part 1 intersect function updates the intersection object as well as the ray, thus by calling intersect on all primtives within the leaf node will update intersection, as well as ray correctly. The more complicated part is when the node is not a leaf node but there is an intersection, because we need to determine which child has the primitive with the closest hit. For this part we must check both left and right child, because jsut because a ray intersects a certain child first doesn't necessarily menas that it will intersect a primitive inside the child first (due to overlapping primitives within the boxes). Thus I created two new ray objects, and two new intersection objects, and pass that to the recursive call to the right and left child. I then check to see if the recursive call returns true or false indicating there is an intersection. If both of the children has been intersected, then I check which intersection object has the closer intersecting time, that would now be my new intersection object. If it only hits a certain child, then I simply set the intersection object to the child that was hit. I then return true indicating if there was an intersection, if there's none then false is returned.</p>
+
+        <p><b>Debug:</b>The major bug in this part is forgetting to return the closest intersection in the BVH intersect function. I just called on the left child then the right child. Thus the left child would always have intersect priority over the right. To fix this I introduced new rays and new intersection, and test the intersections first to see which one is closer. Another bug was instead of using centroid box, I used bounding box to split the BVH this led to segmentation fault. I then realized that if we spling along the bounding box we are bound to have primitives in both sides.</p>
+
+        <p><b>DELIVERABLES:</b></p>
+
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="../static/images/PathTracer/part2/planckbug.png" width="480px" />
+                    <figcaption align="middle">Results Caption: This shows the bug when I didn't check for the closest primitive intersected, and gave priority to the left child, which led disapproval of planck and he turned the other way. The actual for the reason why he is backward is because right child node (the closer intersections) is overshadowed by the call to the left child node first</figcaption>
+                </tr>
+            </table>
+        </div>
+
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="../static/images/PathTracer/part2/p2planck.png" width="480px" />
+                    <figcaption align="middle">Results Caption: After the fix planck now is facing us!</figcaption>
+                </tr>
+            </table>
+        </div>
+
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="../static/images/PathTracer/part2/p2bunny.png" width="480px" />
+                    <figcaption align="middle">Results Caption: bunny is rendred, note that without this BVH acceleration bunny won't be able to render since it would be too costly to check for intersection with every primitives.</figcaption>
+                </tr>
+            </table>
+        </div>
+
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="../static/images/PathTracer/part2/p2dragon.png" width="480px" />
+                    <figcaption align="middle">Results Caption: Another rendering with too many primitives to render without BVH acceleration</figcaption>
+                </tr>
+            </table>
+        </div>
+
+    <h2 align="middle">Assignment 3, Part 3: Direct Illumination</h2>
+        <p><b>Description:</b>This part implements direct lighting, for each intersection of the ray we need to findout what the spectrum that is comingout of that point along our ray (coming from camera), or the radiance along our ray. This is also known as the BRDF of point p, the intersection. The equation for BRDF can be found here:</p>
+
+        <p align="middle"><pre align="middle">http://cs184.eecs.berkeley.edu/cs184_sp16/lecture/reflection/slide_016</pre></p>
+
+        <p>This equation simplies intergrate over all the lights coming into point p from the whole hemisphere and out through the direction w_r. However, in our case we have a fixed number of lights, thus instead of intergrating over the whole hemisphere we can simply sum up how much those light is contributing to the outgoing ray. Thus to implement this I first looped over all the lights if it's a delta light then I only need one sample from that light, since it always contributes the same Spectrum. If it's not a delta light then I sample the number of samples requested. For each light, there is a sample_L function that returns the incoming vector of that sample, the pdf, as well as the spectrum. I then make sure that sampled light point doesn't lies behind the surface, i.e the z-coordinate of the imcoming vector is positive. I then cast a shadow ray along the incoming vector of that sample to make sure that there's nothing in between the point and the light source, no primitives or intersection of the ray from the point to the light source. Thus I did this by calling intersect of the bvh. If there is no intersection then I know that the light source is contributing to the irradiance. At this point I just followed the BRDF formula, where fr is the type of the material of the surface and can be extracted using the intersection bsdf. Li is the sampled spectrum of the light through the incoming vector, and our z direction is [0, 0 ,1] then the cos is simply the z coordinate of the incoming vector (note that incoming vector is in perspective of the object) due to dot product. I then add that to the total radiance with a factor of 1/pdf or the probability distribution function. For each light I averaged out all the sampled and add it to the total returned spectrum, and return that spectrum.</p>
+
+        <p><b>Debug:</b>A bug that I had is when I constructed the shadow ray instead of tracing the incoming ray using the world perspective I used the one that was calculated using the object perspective. Another bug that I encountered is that instead of dividing by the pdf I was multiplying the pdf.</p>
+
+        <p><b>Deliverables:</b></p>
+
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="../static/images/PathTracer/part3/part3bug1.png" width="480px" />
+                    <figcaption align="middle">Results Caption: This bug was when I inorrectly constructed the shadow ray, isntead of tracing in world perspective I was tracing in object perspective.</figcaption>
+                </tr>
+            </table>
+        </div>
+
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="../static/images/PathTracer/part3/part3bug2.png" width="480px" />
+                    <figcaption align="middle">Results Caption: This bug was when I was multiplying by pdf instead of dividing, thus the lighting became very bright everywehre</figcaption>
+                </tr>
+            </table>
+        </div>
+
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="../static/images/PathTracer/part3/bunny1.png" width="480px" />
+                    <figcaption align="middle">Results Caption: With just one light ray per light rendering of the bunny image. Since there's only one ray if the ray intersects something that intersection would be all dark. Thus you can see a lot of dark spots, or noise, inside this rendering.</figcaption>
+                </tr>
+            </table>
+        </div>
+
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="../static/images/PathTracer/part3/bunny4.png" width="480px" />
+                    <figcaption align="middle">Results Caption: Now we are using 4 sample rays per light, since we are averaging them over those ray and return the average you can see that the soft shadow is a smoother, and less noise</figcaption>
+                </tr>
+            </table>
+        </div>
+
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="../static/images/PathTracer/part3/bunny16.png" width="480px" />
+                    <figcaption align="middle">Results Caption: With 16 samples, the soft shadow now is a good shade of gray with little black spots, or noise.</figcaption>
+                </tr>
+            </table>
+        </div>
+
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="../static/images/PathTracer/part3/bunny32.png" width="480px" />
+                    <figcaption align="middle">Results Caption: 32 samples per light, the image is a lot nicer</figcaption>
+                </tr>
+            </table>
+        </div>
+
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="../static/images/PathTracer/part3/bunny64.png" width="480px" />
+                    <figcaption align="middle">Results Caption: finally 64 rays per light.</figcaption>
+                </tr>
+            </table>
+        </div>
+
+        <h2 align="middle">Assignment 3, Part 4: Indirect Illumination</h2>
+        <p><b>Description:</b>This part takes care of the fact that light bounces around. Thus instead of just tracing from the light sources, we traced the ray of an intersection backward to see other light contributions. To implement this first I get the current bsdf sample of the intersection, which not only returns the spectrum, but also the w_in vector, and a probability distribution of that incoming vector. Since w_in vector is in the object coordinate frame, to trace it to find other light sources we converted into wi, which is the world frame version of w_in by muliplying w_in by o2w matrix. Since ray bounces and tracing these bounces might lead to infinite recursion, to prevent this I implemented Russian roullete probability that is based on the material reflectance of the point to terminate the ray. If the reflectance of the point is high which means that the ray bounces more, so terminating probability is low, and vice versa. Thus to get the reflectance we can simply call the illum() function on the bsdf of the intersected point. Thus to get the terminating probability I followed this formula:</p>
+
+        <p align="middle"><pre align="middle">1/reflectance - 1</pre></p>
+
+        <p>I then clamped this between 0 and 1. Thus if the reflectance is large the first term will be small, and it would turns negative which is clamped by 0. Thus with high reflectance we would not terminate the ray. However, if the reflectance is low which means the first term is large, then probability of terminating would be high, less bouncy ray. I then coin flip with the terminating probability, if it terminates then I stop and simply return an empty spectrum. If it doesn't terminate then I create a new ray with origin EPS_D*wi+ hit_p, and direction of wi, the bakcward bounce. I then decrease the depth of the ray 1. I finally call trace_ray on the new ray, since trace ray calls this function both function calls each other. This lead to a recursive algorithm that traces the ray backward to find the spectrum of the current intersection. The reason we can do this is because we assumed the out going spectrum of a bounce is equals to the incoming spectrum where that bounce hit next. Finally is to scale the returned spectrum by cosine factor, and dividing by the pdf as well as the (1- terminating probability).</p>
+
+        <p><b>Debug:</b>WOOOOOOO SURPRSINGLY I FOLLOWED THE SPECS STEP BY STEP AND FOR THE FIRST TIME IT WORKED WITHOUT ANY MAJOR LOGICAL BUG! There were just syntax error, but everything seems to work after the first implementation!<p>
+
+        <p><b>Deliverables:</b></p>
+
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="../static/images/PathTracer/part4/part4Bunny.png" width="480px" />
+                    <figcaption align="middle">Results Caption: Bunny rendered with both direct and indirect lighting, note how there are shadow except it's brighter than with just direct lighting.</figcaption>
+                </tr>
+            </table>
+        </div>
+
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="../static/images/PathTracer/part4/part4dragon.png" width="480px" />
+                    <figcaption align="middle">Results Caption: Similarly dragon is rendered with both direct and indirect lighting</figcaption>
+                </tr>
+            </table>
+        </div>
+
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="../static/images/PathTracer/part4/part4dragon.png" width="480px" />
+                    <figcaption align="middle">Results Caption: Similarly dragon is rendered with both direct and indirect lighting</figcaption>
+                </tr>
+            </table>
+        </div>
+
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="../static/images/PathTracer/part4/D4Bunny.png" width="480px" />
+                    <figcaption align="middle">Results Caption: This bunnyimage is only rendered with direct lighting, thus you can see that it's darker especially in the places where direct lighting doesn't hit it.</figcaption>
+                </tr>
+            </table>
+        </div>
+
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="../static/images/PathTracer/part4/ID4Bunny.png" width="480px" />
+                    <figcaption align="middle">Results Caption: This bunny image is only rendered with indirect lighting, thus there is no direct lighting. Since there's no direct lighting, equilvalent of having no lights so the scene is all black. Additionally indirect lighting depends on the bounces from direct lighting, which also explains why the image is all black.</figcaption>
+                </tr>
+            </table>
+        </div>
+
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="../static/images/PathTracer/part4/m1_1bunny.png" width="480px" />
+                    <figcaption align="middle">Results Caption: bunny is rendered where max_depth_ray is set to only 1, there are a lot of noise.</figcaption>
+                </tr>
+            </table>
+        </div>
+
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="../static/images/PathTracer/part4/m4_1bunny.png" width="480px" />
+                    <figcaption align="middle">Results Caption: bunny is rendered where max_depth_ray is set to only 4, notice that the top far back edge has a lot fewer black spots than the one with depth of 1. Showing how the ray travels more.</figcaption>
+                </tr>
+            </table>
+        </div>
+
+
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="../static/images/PathTracer/part4/m32_1bunny.png" width="480px" />
+                    <figcaption align="middle">Results Caption: bunny is rendered where max_depth_ray is set to only 32.</figcaption>
+                </tr>
+            </table>
+        </div>
+
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="../static/images/PathTracer/part4/1p4spheres.png" width="480px" />
+                    <figcaption align="middle">Results Caption: spheres where there is only 1 sample per pixel, thus there are a lot of noise.</figcaption>
+                </tr>
+            </table>
+        </div>
+
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="../static/images/PathTracer/part4/4p4spheres.png" width="480px" />
+                    <figcaption align="middle">Results Caption: spheres where there are 4 samples per pixel, which has less noise compared to the previous.</figcaption>
+                </tr>
+            </table>
+        </div>
+
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="../static/images/PathTracer/part4/16p4spheres.png" width="480px" />
+                    <figcaption align="middle">Results Caption: spheres where there is 16 samples per pixel, giving more chances to the terminating intersections in indirect lighting. A lot more clear.</figcaption>
+                </tr>
+            </table>
+        </div>
+
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="../static/images/PathTracer/part4/64p4spheres.png" width="480px" />
+                    <figcaption align="middle">Results Caption: spheres where there is only 64 samples per pixel.</figcaption>
+                </tr>
+            </table>
+        </div>
+
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="../static/images/PathTracer/part4/1024p4spheres.png" width="480px" />
+                    <figcaption align="middle">Results Caption: spheres where there is only 1024 samples per pixel! IT'S BEAUTIFUL!</figcaption>
+                </tr>
+            </table>
+        </div>
+
+
+
+
+
+
+
+        <h2 align="middle">Assignment 3, Part 5: Materials</h2>
+        <p><b>Description:</b>
+        <p>Reflect/Mirror: This part we implement how each material interact with the itnersecting rays and spectrum. The first function is reflect which is given a vector, calculate the reflection vector of the other vector. Since the normal vector in object world is always [0, 0, 1], To calculate the reflected vector I used the following formula:</p>
+
+        <p align="middle"><pre align="middle">Vreflect = -Vin + 2*(dot(Vin, normal))*normal</pre></p>
+
+        <p>This can be found inside lecture slide with a perfect reflection material. I then implemented sample_f and f functions for mirror material, which is based off of the reflect function. For these functions I simply called the reflect function which would returns the corresponding reflect vector. For spectrum I simply returned the reflectance of the material, and the pdf is 1 since the probability of this reflect is always 1.</p>
+
+        <p>Refract/Glass: For the refract function first I assume that the incoming ray is coming from a vacuum into an object. Thus I set the index of refraction for the imcoming vector to be 1, and the out going vector to be ior, index of refraction of the material. I then check the cosine between the surface normal and the incoming object, since the normal is [0, 0 , 1] so the cosine term is simply the z-coordinate of the incoming vector. Thus if the z-coordinate of this vector is negative then I know that the incoming vector is coming from the INSIDE of the object and the outgoing vector is outside. Thus I switch the index of refraction accordingly, as well as changing my normal vector to [0, 0, -1] so it points in the different way of the outgoing vector. Since by convention the incoming vector is pointing away of the object in BSDF, thus I multiplied the incoming vector by -1 to switch the direction. I then check to see if it's total internal reflection by using:</p>
+
+        <p align="middle"><pre align="middle">ni*sin(w_in) >= no</pre></p>
+        <p>where ni is the index of refraction of the incoming vector, and no is the index of refraction for the out going, and w_in is the incoming vector. Lastly is that if it's not total internal reflection, then I calculate the outgoing vector by using the vector form formula of snell's law in the below link:</p>
+
+        <p align="middle"><pre align="middle">https://en.wikipedia.org/wiki/Snell%27s_law</pre></p>
+
+        <p>I then went to implement the BSDF of glass materials, which uses both reflection and refraction. For this algorithm I first check if the certain intersection has a refracting component to it, i. it's not total internal reflection. If there is no refracting component then I simply implement the reflect function similar to before, where the pdf is equals to 1. However instead of returning the whole reflectance I scale it by schlick approximation and 1/cos(incoming vector). If there is a refracting component, then I calculate the probibility of it reflecting using the schlick approximation. Then conflipped that probability, if it turns out to be true then I simply do as I do when reflecting. However the pdf is no longer one, it's the schlick approximation, since that was the probility of it reflecting. If the coin flip suggests refracting then I set the pdf to be 1 - Schlick's approximation. I then call on the refract function to calculate the outgoing vector. Finally is I scaled the transmittance by (1 - R)*pow((no/ni), 2)/cos_theta(wo) where R is the Schlick's approximation. no and ni are the index of refraction according to the vectors.</p>
+
+        <p><b>Debug:</b>A bug I encountered is in sphere intersect, where I did not account for the fact that the ray might be coming from inside the sphere. The fix was simple, refer back to part 1 task 4 for more information. Another bug that I encountered is messing up the signs of the incoming and outgoing ray, to fix this I just reimplemeneted the function step by step to make sure everything was fine. Another one! is that when calculating the Schlick's approximation instead of using ((n1 - n2)/(n1 + n2))^2 I was subtracting on the bottom so it always resulted in 1, so I was only reflecting. Lastly is the bug when I forgot to scale my reflectance spectrum by the schlick's approximationg thus reflectance was very noticable.<p>
+
+        <p><b>Deliverables:</b></p>
+
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="../static/images/PathTracer/part5/spheres_bug1.png" width="480px" />
+                    <figcaption align="middle">Results Caption: This shows the bug where my negative and positive signs were mixed up, and I had to restart the implementation making sure everything was correct.</figcaption>
+                </tr>
+            </table>
+        </div>
+
+
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="../static/images/PathTracer/part5/spheres_bug2.png" width="480px" />
+                    <figcaption align="middle">Results Caption: I did not account for the fact that rays might be coming from inside of the spheres.</figcaption>
+                </tr>
+            </table>
+        </div>
+
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="../static/images/PathTracer/part5/spheres_bug3.png" width="480px" />
+                    <figcaption align="middle">Results Caption: I did not scale the reflection factor in the glass sphere by schlick approximation, thus the reflection was very noticable and strong.</figcaption>
+                </tr>
+            </table>
+        </div>
+
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="../static/images/PathTracer/part5/m1_spheres.png" width="480px" />
+                    <figcaption align="middle">Results Caption: rendered where max_depth_ray is equals to 1, thus after one bounce the ray terminates. Thus we couldn't see the refraction factor in the closer sphere. Additionally in the mirror sphere the closer sphere appears as black because of limitation of ray depth. Additionally the bottom the further sphere is black which was suppose to be mirror of the reflected floor!</figcaption>
+                </tr>
+            </table>
+        </div>
+
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="../static/images/PathTracer/part5/m2_spheres.png" width="480px" />
+                    <figcaption align="middle">Results Caption: rendered where max_depth_ray is equals to 2. Since the depth is now 2 we can see the refraction factor of the closer sphere. However, it's not enough to account for the reflection of closer sphere onto the further sphere! Thus it appears as black, when clearly it is not black.</figcaption>
+                </tr>
+            </tabl
+
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="../static/images/PathTracer/part5/m16_spheres.png" width="480px" />
+                    <figcaption align="middle">Results Caption: rendered where max_depth_ray is 16, with this we had enough depth to take refraction into account, as well as reflecting multiple times. Thus we now can see now refraction works in the closer sphere, as well as the reflection of the closer sphere onto the further one is also correctly rendered. However there's still some noise in the reflection</figcaption>
+                </tr>
+            </table>
+        </div>
+
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="../static/images/PathTracer/part5/m16_spheres.png" width="480px" />
+                    <figcaption align="middle">Results Caption: rendered where max_depth_ray is 16, with this we had enough depth to take refraction into account, as well as reflecting multiple times. Thus we now can see now refraction works in the closer sphere, as well as the reflection of the closer sphere onto the further one is also correctly rendered. However there's still some noise in the reflection</figcaption>
+                </tr>
+            </table>
+        </div>
+
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="../static/images/PathTracer/part5/m16_spheres.png" width="480px" />
+                    <figcaption align="middle">Results Caption: rendered where max_depth_ray is 100! reflection and refraction are now all seen very well through the spheres including the right side of the closer sphere, which refract the mirror sphere onto its right side.</figcaption>
+                </tr>
+            </table>
+        </div>
+
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="../static/images/PathTracer/part5/spheres_1.png" width="480px" />
+                    <figcaption align="middle">Results Caption: rendered where max_depth_ray is 100, but with only 1 sample per pixel. Thus even those there are both reflection and refraction, there's a lot of noise because if a ray terminates then the intersection would just be black since there are no more sample to test that intersection</figcaption>
+                </tr>
+            </table>
+        </div>
+
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="../static/images/PathTracer/part5/spheres_1.png" width="480px" />
+                    <figcaption align="middle">Results Caption: rendered where max_depth_ray is 100, but with only 1 sample per pixel. Thus even those there are both reflection and refraction, there's a lot of noise because if a ray terminates then the intersection would just be black since there are no more sample to test that intersection</figcaption>
+                </tr>
+            </table>
+        </div>
+
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="../static/images/PathTracer/part5/spheres_4.png" width="480px" />
+                    <figcaption align="middle">Results Caption: rendered where max_depth_ray is 100, samples per pixel is 4. Thus we can see that there is less noise in this one compared to the previous, due to more sample. Additonally if a ray happens to terminate early there are other rays to takes it place. However, sample is still low, thus there are a lot of noise</figcaption>
+                </tr>
+            </table>
+        </div>
+
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="../static/images/PathTracer/part5/spheres_16.png" width="480px" />
+                    <figcaption align="middle">Results Caption: rendered where max_depth_ray is 100, samples per pixel is 16. Similar reasons it's a lot better than previous one.</figcaption>
+                </tr>
+            </table>
+        </div>
+
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="../static/images/PathTracer/part5/spheres_64.png" width="480px" />
+                    <figcaption align="middle">Results Caption: rendered where max_depth_ray is 100, samples per pixel is 64. The noise level has decreased dramatically.</figcaption>
+                </tr>
+            </table>
+        </div>
+
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="../static/images/PathTracer/part5/spheres_1024.png" width="480px" />
+                    <figcaption align="middle">Results Caption: rendered where max_depth_ray is 100, samples per pixel is 1024! LOOK AT THAT THING! THE COMPUTATIONAL POWER REQUIRED FOR THAT OH MA GAWD! PLEASE APPRECIATE HOW BEAUTIFUL IT IS THE AMOUNT OF WORK, TEARS, BLOOD, FRUSTRATION, LOVE, EMOTIONS THAT WENT INTO THAT! #accomplished! *cries*</figcaption>
+                </tr>
+            </table>
+        </div>
+
+</div>
+</body>
+</html>
+
+
+
+
